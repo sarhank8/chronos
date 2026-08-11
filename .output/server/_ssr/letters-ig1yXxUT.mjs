@@ -1,0 +1,253 @@
+import { r as __toESM } from "../_runtime.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { h as Link } from "../_libs/@tanstack/react-router+[...].mjs";
+import { f as require_jsx_runtime } from "../_libs/@radix-ui/react-avatar+[...].mjs";
+import { a as supabase, i as useAuth } from "./router-T3nTODM3.mjs";
+import { t as Button } from "./button-DRsC1qZi.mjs";
+import { t as Textarea } from "./textarea-DBn9CRiI.mjs";
+import { g as Clock3, h as Globe, l as PenLine, m as Lock, n as Users } from "../_libs/lucide-react.mjs";
+import { i as SiteHeader, n as AvatarFallback, r as AvatarImage, t as Avatar } from "./site-header-BwfxK3TA.mjs";
+import { t as useRequireAuth } from "./use-require-auth-C335W4BK.mjs";
+import { t as Input } from "./input-DicJzR9-.mjs";
+import { t as formatDistanceToNow } from "../_libs/date-fns.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/letters-ig1yXxUT.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+function LettersPage() {
+	const { loading } = useRequireAuth();
+	const { profile } = useAuth();
+	const [letters, setLetters] = (0, import_react.useState)([]);
+	const [feedLoading, setFeedLoading] = (0, import_react.useState)(true);
+	const [title, setTitle] = (0, import_react.useState)("");
+	const [content, setContent] = (0, import_react.useState)("");
+	const [visibility, setVisibility] = (0, import_react.useState)("private");
+	const [deliverAt, setDeliverAt] = (0, import_react.useState)("");
+	const [posting, setPosting] = (0, import_react.useState)(false);
+	const [error, setError] = (0, import_react.useState)(null);
+	const loadLetters = async () => {
+		setFeedLoading(true);
+		const { data, error: fetchError } = await supabase.from("letters").select("*, profile:profiles(username, display_name, avatar_url)").order("created_at", { ascending: false }).limit(50);
+		if (!fetchError && data) setLetters(data);
+		setFeedLoading(false);
+	};
+	(0, import_react.useEffect)(() => {
+		if (!loading) loadLetters();
+	}, [loading]);
+	const handlePost = async (e) => {
+		e.preventDefault();
+		if (!profile) return;
+		if (!content.trim()) {
+			setError("Write something first.");
+			return;
+		}
+		setError(null);
+		setPosting(true);
+		const { error: insertError } = await supabase.from("letters").insert({
+			author_id: profile.id,
+			title: title.trim() || "Untitled",
+			content: content.trim(),
+			is_private: visibility === "private",
+			deliver_at: deliverAt ? new Date(deliverAt).toISOString() : null
+		});
+		setPosting(false);
+		if (insertError) {
+			setError(insertError.message);
+			return;
+		}
+		setTitle("");
+		setContent("");
+		setDeliverAt("");
+		setVisibility("private");
+		loadLetters();
+	};
+	if (loading) return null;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "min-h-screen bg-background text-foreground",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SiteHeader, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("main", {
+			className: "mx-auto max-w-3xl px-6 py-14",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+					className: "text-4xl leading-tight",
+					children: "Letters"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "mt-2 text-muted-foreground",
+					children: "Yours, plus shared letters from people you follow and from public accounts."
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+					onSubmit: handlePost,
+					className: "mt-10 rounded-[1.75rem] border border-border bg-card p-7 shadow-paper",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							value: title,
+							onChange: (e) => setTitle(e.target.value),
+							placeholder: "Title (optional)",
+							className: "border-none px-0 text-xl shadow-none focus-visible:ring-0"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "mt-2 rounded-xl border border-border bg-background/60 px-4 py-4 shadow-inner shadow-stone-200/40",
+							style: {
+								backgroundImage: "repeating-linear-gradient(to bottom, rgba(51,51,51,0.08) 0, rgba(51,51,51,0.08) 1px, transparent 1px, transparent 26px)",
+								backgroundColor: "#fcfaf5"
+							},
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "mb-3 flex items-center justify-between border-b border-dashed border-border/80 pb-2 text-[0.68rem] uppercase tracking-[0.2em] text-muted-foreground/80",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										style: { fontFamily: "\"Segoe Print\", \"Bradley Hand\", \"Comic Sans MS\", cursive" },
+										children: "Dear future me,"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: (/* @__PURE__ */ new Date()).toLocaleDateString() })]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Textarea, {
+									value: content,
+									onChange: (e) => setContent(e.target.value),
+									placeholder: "Right now I’m working on…",
+									className: "min-h-40 resize-none border-0 bg-transparent p-0 text-base leading-8 shadow-none focus-visible:ring-0",
+									style: {
+										fontFamily: "\"Segoe Print\", \"Bradley Hand\", \"Comic Sans MS\", cursive",
+										lineHeight: "2.1rem",
+										background: "transparent"
+									}
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "mt-4 border-t border-dashed border-border/80 pt-3 text-[0.68rem] uppercase tracking-[0.2em] text-muted-foreground/80",
+									children: "Yours, —"
+								})
+							]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "mt-5 flex flex-wrap items-center gap-3",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex rounded-full border border-border bg-background p-1 text-sm",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+										type: "button",
+										onClick: () => setVisibility("private"),
+										className: `flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors ${visibility === "private" ? "bg-foreground text-background" : "text-muted-foreground"}`,
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, {
+											className: "size-3.5",
+											strokeWidth: 1.75
+										}), " Only me"]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+										type: "button",
+										onClick: () => setVisibility("shared"),
+										className: `flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors ${visibility === "shared" ? "bg-foreground text-background" : "text-muted-foreground"}`,
+										children: [profile?.is_private ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Users, {
+											className: "size-3.5",
+											strokeWidth: 1.75
+										}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Globe, {
+											className: "size-3.5",
+											strokeWidth: 1.75
+										}), profile?.is_private ? "Followers" : "Everyone"]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", {
+									className: "flex items-center gap-2 text-sm text-muted-foreground",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Clock3, {
+											className: "size-3.5",
+											strokeWidth: 1.75
+										}),
+										"Deliver on",
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+											type: "date",
+											value: deliverAt,
+											onChange: (e) => setDeliverAt(e.target.value),
+											className: "rounded-md border border-border bg-background px-2 py-1 text-sm"
+										})
+									]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+									type: "submit",
+									disabled: posting,
+									className: "ml-auto rounded-full px-6",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PenLine, {
+										className: "size-4",
+										strokeWidth: 1.75
+									}), posting ? "Sealing…" : "Seal letter"]
+								})
+							]
+						}),
+						error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "mt-3 text-sm text-destructive",
+							children: error
+						})
+					]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mt-12 divide-y divide-border border-y border-border",
+					children: [
+						feedLoading && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "py-8 text-sm text-muted-foreground",
+							children: "Loading letters…"
+						}),
+						!feedLoading && letters.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "py-8 text-sm text-muted-foreground",
+							children: "No letters yet. Write one above, or follow people to see theirs."
+						}),
+						letters.map((letter) => {
+							const isFuture = letter.deliver_at && new Date(letter.deliver_at) > /* @__PURE__ */ new Date();
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("article", {
+								className: "py-7",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-3",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+												className: "size-9",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, { src: letter.profile.avatar_url ?? void 0 }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+													className: "text-xs",
+													children: (letter.profile.display_name || letter.profile.username).slice(0, 1).toUpperCase()
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+												to: "/profile/$username",
+												params: { username: letter.profile.username },
+												className: "text-sm font-medium hover:underline",
+												children: letter.profile.display_name || letter.profile.username
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-xs text-muted-foreground",
+												children: formatDistanceToNow(new Date(letter.created_at), { addSuffix: true })
+											})] }),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+												className: "ml-auto flex items-center gap-1 text-xs text-muted-foreground",
+												children: [letter.is_private ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, {
+													className: "size-3.5",
+													strokeWidth: 1.5
+												}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Globe, {
+													className: "size-3.5",
+													strokeWidth: 1.5
+												}), letter.is_private ? "Only them" : "Shared"]
+											})
+										]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+										className: "mt-4 text-2xl",
+										children: letter.title
+									}),
+									isFuture ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+										className: "mt-2 flex items-center gap-2 text-sm text-muted-foreground",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, {
+												className: "size-4",
+												strokeWidth: 1.5
+											}),
+											" Sealed until",
+											" ",
+											new Date(letter.deliver_at).toLocaleDateString()
+										]
+									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+										className: "mt-2 whitespace-pre-wrap text-[1.0625rem] leading-relaxed text-muted-foreground",
+										children: letter.content
+									})
+								]
+							}, letter.id);
+						})
+					]
+				})
+			]
+		})]
+	});
+}
+//#endregion
+export { LettersPage as component };

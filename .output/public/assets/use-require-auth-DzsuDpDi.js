@@ -1,0 +1,1 @@
+import{Y as e,q as t,s as n}from"./supabase-C70Y-1qI.js";import{n as r}from"./use-auth-Dn6hvkt1.js";var i=e(t(),1);function a(){let{user:e,loading:t}=r(),a=n();return(0,i.useEffect)(()=>{!t&&!e&&a.navigate({to:`/login`})},[t,e,a]),{user:e,loading:t}}export{a as t};
