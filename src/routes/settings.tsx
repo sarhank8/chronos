@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Route = createFileRoute("/settings")({
-  head: () => ({ meta: [{ title: "Settings — Future Me" }] }),
+  head: () => ({ meta: [{ title: "Settings — Chronos" }] }),
   component: SettingsPage,
 });
 

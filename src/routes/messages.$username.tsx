@@ -61,7 +61,7 @@ function ConversationPage() {
         .on(
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "messages" },
-          (payload) => {
+          (payload: any) => {
             const row = payload.new as Message;
             const involvesUs =
               (row.sender_id === me.id && row.recipient_id === partnerData.id) ||

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Route = createFileRoute("/people")({
-  head: () => ({ meta: [{ title: "People — Future Me" }] }),
+  head: () => ({ meta: [{ title: "People — Chronos" }] }),
   component: PeoplePage,
 });
 
@@ -33,9 +33,10 @@ function PeoplePage() {
     if (q.trim()) {
       request = request.or(`username.ilike.%${q}%,display_name.ilike.%${q}%`);
     }
-    if (profile) request = request.neq("id", profile.id);
     const { data } = await request;
-    setPeople((data as Profile[]) ?? []);
+    // Filter out ourselves client-side (the fallback mock doesn't support .neq())
+    const filtered = ((data as Profile[]) ?? []).filter((p) => !profile || p.id !== profile.id);
+    setPeople(filtered);
 
     if (profile && data && data.length > 0) {
       const { data: follows } = await supabase
@@ -44,10 +45,10 @@ function PeoplePage() {
         .eq("follower_id", profile.id)
         .in(
           "following_id",
-          data.map((p) => p.id),
+          data.map((p: any) => p.id),
         );
       const map: Record<string, FollowStatus> = {};
-      follows?.forEach((f) => {
+      follows?.forEach((f: any) => {
         map[f.following_id] = f.status as FollowStatus;
       });
       setFollowMap(map);

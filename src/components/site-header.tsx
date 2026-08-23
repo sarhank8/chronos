@@ -14,6 +14,7 @@ import {
 
 const navLinks = [
   { to: "/letters", label: "Letters" },
+  { to: "/global", label: "Global Board" },
   { to: "/people", label: "People" },
   { to: "/messages", label: "Messages" },
 ];
@@ -44,6 +45,15 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
+          {user && profile?.username && (
+            <Link
+              to="/profile/$username"
+              params={{ username: profile.username }}
+              className="transition-colors hover:text-foreground [&.active]:text-foreground"
+            >
+              My Profile
+            </Link>
+          )}
         </nav>
 
         {user ? (

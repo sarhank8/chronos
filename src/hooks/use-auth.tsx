@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 
-import { supabase, type Profile } from "@/lib/supabase";
+import { supabase, getLocalSession, getLocalProfile, signOutLocalUser, type Profile } from "@/lib/supabase";
 
 type AuthContextValue = {
   user: User | null;
@@ -9,6 +9,7 @@ type AuthContextValue = {
   profile: Profile | null;
   loading: boolean;
   refreshProfile: () => Promise<void>;
+  refreshSession: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -21,48 +22,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = async (userId: string) => {
     const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
-    setProfile(data as Profile | null);
+    if (data) {
+      setProfile(data as Profile);
+    } else {
+      const localP = getLocalProfile(userId);
+      setProfile(localP);
+    }
+  };
+
+  const syncAuth = async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data?.session?.user) {
+      setSession(data.session);
+      await loadProfile(data.session.user.id);
+      return;
+    }
+
+    const local = getLocalSession();
+    if (local?.session) {
+      setSession(local.session as unknown as Session);
+      setProfile(local.profile);
+    } else {
+      setSession(null);
+      setProfile(null);
+    }
   };
 
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      setSession(data.session);
-      if (data.session?.user) {
-        loadProfile(data.session.user.id).finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
+    syncAuth().finally(() => {
+      if (mounted) setLoading(false);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
+    const { data: listener } = supabase.auth.onAuthStateChange((_event: string, newSession: Session | null) => {
+      if (!mounted) return;
       if (newSession?.user) {
+        setSession(newSession);
         loadProfile(newSession.user.id);
       } else {
-        setProfile(null);
+        const local = getLocalSession();
+        if (local?.session) {
+          setSession(local.session as unknown as Session);
+          setProfile(local.profile);
+        } else {
+          setSession(null);
+          setProfile(null);
+        }
       }
     });
 
     return () => {
       mounted = false;
-      listener.subscription.unsubscribe();
+      listener?.subscription?.unsubscribe();
     };
   }, []);
 
   const refreshProfile = async () => {
-    if (session?.user) await loadProfile(session.user.id);
+    const currentUserId = session?.user?.id;
+    if (currentUserId) await loadProfile(currentUserId);
   };
 
   const signOut = async () => {
+    signOutLocalUser();
     await supabase.auth.signOut();
+    setSession(null);
+    setProfile(null);
   };
 
   return (
     <AuthContext.Provider
-      value={{ user: session?.user ?? null, session, profile, loading, refreshProfile, signOut }}
+      value={{ user: session?.user ?? null, session, profile, loading, refreshProfile, refreshSession: syncAuth, signOut }}
     >
       {children}
     </AuthContext.Provider>
@@ -74,3 +104,4 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
   return ctx;
 }
+

@@ -9,7 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Route = createFileRoute("/messages")({
-  head: () => ({ meta: [{ title: "Messages — Future Me" }] }),
+  head: () => ({ meta: [{ title: "Messages — Chronos" }] }),
   component: MessagesInbox,
 });
 
@@ -66,7 +66,7 @@ function MessagesInbox() {
         .select("id, username, display_name, avatar_url")
         .in("id", partnerIds);
 
-      const list: Conversation[] = (profiles ?? []).map((p) => {
+      const list: Conversation[] = (profiles ?? []).map((p: any) => {
         const info = byPartner.get(p.id)!;
         return { partner: p, lastContent: info.content, lastAt: info.at, unread: info.unread };
       });
